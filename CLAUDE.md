@@ -59,6 +59,6 @@ result, and wait for confirmation before the next step.
 - [x] Git init, GitHub repo (public, badgerwise/wc-connect), tag v0.1.0
       pushed (2026-07-02). Renamed vendor/namespace goldengrip -> badgerwise.
       Pushed from the `parljohn` gh account (badgerwise org) over HTTPS.
-- [ ] Publish to Packagist (manual: needs Packagist login — submit
-      https://github.com/badgerwise/wc-connect, then add the GitHub webhook
-      for auto-updates)
+- [x] Published to Packagist as badgerwise/wc-connect @ v0.1.0 (2026-07-02).
+      Auto-update webhook (packagist.org/api/github) active on the repo via
+      the Packagist GitHub OAuth connection. `composer require badgerwise/wc-connect`.
