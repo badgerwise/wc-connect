@@ -56,4 +56,9 @@ result, and wait for confirmation before the next step.
 - [x] README with usage examples (app password flow + consumer keys,
       authorization flow, generic client, resource helpers, pagination,
       error handling, custom HTTP client) (2026-07-02)
-- [ ] Git init, GitHub repo, tag v0.1.0, publish to Packagist
+- [x] Git init, GitHub repo (public, badgerwise/wc-connect), tag v0.1.0
+      pushed (2026-07-02). Renamed vendor/namespace goldengrip -> badgerwise.
+      Pushed from the `parljohn` gh account (badgerwise org) over HTTPS.
+- [ ] Publish to Packagist (manual: needs Packagist login — submit
+      https://github.com/badgerwise/wc-connect, then add the GitHub webhook
+      for auto-updates)
