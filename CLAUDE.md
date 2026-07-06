@@ -62,3 +62,9 @@ result, and wait for confirmation before the next step.
 - [x] Published to Packagist as badgerwise/wc-connect @ v0.1.0 (2026-07-02).
       Auto-update webhook (packagist.org/api/github) active on the repo via
       the Packagist GitHub OAuth connection. `composer require badgerwise/wc-connect`.
+- [x] v0.2.0 (2026-07-06): `Auth\ApplicationPassword` exposes `username()` and
+      `appPassword()` accessors so consuming apps can persist the credential
+      after the authorize-application flow (`appPassword()` returns the
+      space-stripped storable form; store URL intentionally not exposed — not
+      this credential's concern). 57 tests, PHPStan level 8 clean. Committed to
+      main (c31d2ae), tag v0.2.0 pushed; Packagist auto-updates via webhook.
