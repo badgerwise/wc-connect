@@ -30,4 +30,26 @@ final readonly class ApplicationPassword implements AuthInterface
 
         return $request->withHeader('Authorization', 'Basic ' . $credentials);
     }
+
+    /**
+     * The WordPress username these credentials authenticate as.
+     *
+     * Exposed so a consuming application can persist the credential — e.g.
+     * store it against a user/device after the authorize-application flow.
+     */
+    public function username(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * The application password, with display spaces already stripped.
+     *
+     * Sensitive: read this only to persist the credential securely (encrypt at
+     * rest); never log it.
+     */
+    public function appPassword(): string
+    {
+        return $this->password;
+    }
 }

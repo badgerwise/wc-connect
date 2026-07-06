@@ -49,4 +49,15 @@ final class ApplicationPasswordTest extends TestCase
         self::assertNotSame($original, $authenticated);
         self::assertFalse($original->hasHeader('Authorization'));
     }
+
+    #[Test]
+    public function it_exposes_the_username_and_app_password_for_persistence(): void
+    {
+        $auth = new ApplicationPassword('admin', 'abcd efgh ijkl mnop qrst uvwx');
+
+        self::assertSame('admin', $auth->username());
+        // Spaces are stripped on the way in, so the accessor returns the
+        // storable form that authenticate() actually uses.
+        self::assertSame('abcdefghijklmnopqrstuvwx', $auth->appPassword());
+    }
 }
