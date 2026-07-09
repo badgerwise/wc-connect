@@ -255,6 +255,59 @@ final class WcConnectTest extends TestCase
     }
 
     #[Test]
+    public function it_uploads_media_to_the_wp_media_library(): void
+    {
+        $this->http->willReturn(
+            201,
+            '{"id":510,"source_url":"https://store.example.com/wp-content/uploads/porch.jpg"}',
+        );
+
+        $result = $this->client()->uploadMedia('BINARY-BYTES', 'porch.jpg', 'image/jpeg');
+
+        $request = $this->http->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame(
+            'https://store.example.com/wp-json/wp/v2/media',
+            (string) $request->getUri(),
+        );
+        self::assertSame('image/jpeg', $request->getHeaderLine('Content-Type'));
+        self::assertSame(
+            'attachment; filename="porch.jpg"',
+            $request->getHeaderLine('Content-Disposition'),
+        );
+        self::assertSame('BINARY-BYTES', (string) $request->getBody());
+        self::assertSame('Basic dGVzdA==', $request->getHeaderLine('Authorization'));
+        self::assertSame(510, $result['id']);
+    }
+
+    #[Test]
+    public function it_uploads_media_under_wp_v2_regardless_of_namespace(): void
+    {
+        $this->http->willReturn(201, '{"id":1}');
+
+        // Even a wc/v3 client uploads to core WordPress' wp/v2/media.
+        $this->client(namespace: 'wc/v3')->uploadMedia('x', 'a.png', 'image/png');
+
+        self::assertStringEndsWith(
+            '/wp-json/wp/v2/media',
+            (string) $this->http->lastRequest()->getUri(),
+        );
+    }
+
+    #[Test]
+    public function it_sanitises_the_upload_filename(): void
+    {
+        $this->http->willReturn(201, '{"id":1}');
+
+        $this->client()->uploadMedia('x', "../evil\".jpg", 'image/jpeg');
+
+        self::assertSame(
+            'attachment; filename="evil.jpg"',
+            $this->http->lastRequest()->getHeaderLine('Content-Disposition'),
+        );
+    }
+
+    #[Test]
     public function it_wraps_transport_failures_in_a_wc_connect_exception(): void
     {
         $transportError = new class ('connection refused') extends \RuntimeException implements ClientExceptionInterface {

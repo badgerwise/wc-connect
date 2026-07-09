@@ -142,6 +142,26 @@ $wp = new WcConnect('https://store.example.com', $auth, apiNamespace: 'wp/v2');
 $posts = $wp->get('posts');
 ```
 
+### Uploading a file to the Media Library
+
+`uploadMedia()` posts a file to WordPress' Media Library (`wp/v2/media`) and
+returns the created media object — regardless of the client's namespace. Handy
+for attaching images/PDFs (e.g. a delivery photo) and then referencing the
+returned `id` / `source_url` from an order's `meta_data`.
+
+```php
+$media = $wc->uploadMedia(
+    contents: file_get_contents('/path/to/porch.jpg'),
+    filename: 'porch.jpg',
+    mimeType: 'image/jpeg',
+);
+
+$media['id'];         // 510
+$media['source_url']; // https://store.example.com/wp-content/uploads/porch.jpg
+```
+
+The authenticated user needs the WordPress `upload_files` capability.
+
 ## Resource helpers
 
 Typed sugar over the generic client. Each helper exposes

@@ -68,3 +68,10 @@ result, and wait for confirmation before the next step.
       space-stripped storable form; store URL intentionally not exposed — not
       this credential's concern). 57 tests, PHPStan level 8 clean. Committed to
       main (c31d2ae), tag v0.2.0 pushed; Packagist auto-updates via webhook.
+- [x] v0.3.0 (2026-07-09): `WcConnect::uploadMedia($contents, $filename, $mimeType)`
+      posts a file to WordPress' Media Library (`wp/v2/media`, raw body +
+      Content-Disposition), returning the media object — targets `wp/v2` regardless
+      of the client's namespace. Shared send/parse extracted into a private
+      `dispatch()`. Reusable primitive for attaching images/PDFs to orders (the
+      consuming app references the returned id/url in order meta_data). 60 tests,
+      PHPStan level 8 clean. Tag v0.3.0 pushed; Packagist auto-updates via webhook.

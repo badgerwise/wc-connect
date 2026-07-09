@@ -17,6 +17,7 @@ use Http\Discovery\Psr18ClientDiscovery;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
@@ -159,10 +160,7 @@ final class WcConnect
             $uri .= '?' . http_build_query($query);
         }
 
-        $request = $this->requestFactory
-            ->createRequest($method, $uri)
-            ->withHeader('Accept', 'application/json')
-            ->withHeader('User-Agent', 'badgerwise/wc-connect');
+        $request = $this->requestFactory->createRequest($method, $uri);
 
         if ($body !== null) {
             $json = json_encode($body, JSON_THROW_ON_ERROR);
@@ -171,7 +169,53 @@ final class WcConnect
                 ->withBody($this->streamFactory->createStream($json));
         }
 
-        $request = $this->auth->authenticate($request);
+        return $this->dispatch($request);
+    }
+
+    /**
+     * Upload a file to the WordPress Media Library and return the created media
+     * object (with `id`, `source_url`, etc.). Always targets core WordPress'
+     * `wp/v2/media`, regardless of this client's configured namespace.
+     *
+     * The authenticated user needs the WordPress `upload_files` capability.
+     *
+     * @param string $contents Raw file bytes.
+     * @param string $filename Name WordPress stores the file under; its extension
+     *                         determines the resulting attachment's type.
+     * @param string $mimeType Content type, e.g. image/jpeg, image/png, application/pdf.
+     *
+     * @return array<mixed> The decoded media object.
+     *
+     * @throws ApiException       on a non-2xx API response
+     * @throws WcConnectException on transport failure or invalid JSON
+     */
+    public function uploadMedia(string $contents, string $filename, string $mimeType): array
+    {
+        // Use the basename and strip characters that would break the header.
+        $filename = str_replace(['"', "\r", "\n"], '', basename($filename));
+
+        $request = $this->requestFactory
+            ->createRequest('POST', sprintf('%s/wp-json/wp/v2/media', $this->baseUrl))
+            ->withHeader('Content-Type', $mimeType)
+            ->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $filename))
+            ->withBody($this->streamFactory->createStream($contents));
+
+        return $this->dispatch($request)->data;
+    }
+
+    /**
+     * Apply the standard headers + authentication, send the request, and parse
+     * the response.
+     *
+     * @throws WcConnectException on transport failure
+     */
+    private function dispatch(RequestInterface $request): Response
+    {
+        $request = $this->auth->authenticate(
+            $request
+                ->withHeader('Accept', 'application/json')
+                ->withHeader('User-Agent', 'badgerwise/wc-connect'),
+        );
 
         try {
             $response = $this->client->sendRequest($request);
