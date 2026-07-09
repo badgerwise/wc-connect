@@ -75,3 +75,9 @@ result, and wait for confirmation before the next step.
       `dispatch()`. Reusable primitive for attaching images/PDFs to orders (the
       consuming app references the returned id/url in order meta_data). 60 tests,
       PHPStan level 8 clean. Tag v0.3.0 pushed; Packagist auto-updates via webhook.
+- [x] v0.4.0 (2026-07-09): `WebhookSignature::verify($payload, $secret, $signature)`
+      (+ `compute()`) — timing-safe check of WooCommerce's
+      `base64(HMAC-SHA256(rawBody, secret))` `X-WC-Webhook-Signature`, so a
+      consuming app can trust inbound webhooks (order events, etc.). Framework-
+      agnostic (string in, bool out); the receiving endpoint stays in the app.
+      66 tests, PHPStan level 8 clean. Tag v0.4.0 pushed; Packagist auto-updates.

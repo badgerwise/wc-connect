@@ -214,6 +214,26 @@ do {
 } while ($page !== null);
 ```
 
+## Verifying incoming webhooks
+
+WooCommerce can push events (new order, status change, …) to your app. Each
+delivery is signed as `base64(HMAC-SHA256(rawBody, secret))` in the
+`X-WC-Webhook-Signature` header. Verify it against the **raw** request body
+before trusting the payload:
+
+```php
+use BadgerWise\WcConnect\WebhookSignature;
+
+if (! WebhookSignature::verify($rawBody, $webhookSecret, $signatureHeader)) {
+    // reject: 401 / ignore
+}
+// trusted — decode $rawBody and handle the event
+```
+
+The check is timing-safe and returns `false` for an empty or mismatched
+signature. Use the exact bytes received (e.g. Laravel's `$request->getContent()`),
+not a re-encoded array, or the signature won't match.
+
 ## Error handling
 
 Every failure is a `WcConnectException` (extends `RuntimeException`), so a single
